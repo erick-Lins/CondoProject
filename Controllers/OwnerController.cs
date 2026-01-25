@@ -53,7 +53,13 @@ namespace CondoProj.Controllers
         [HttpPost]
         public ActionResult Create(Owner owner)
         {
-            service.CreateOwner(owner);
+            var result = service.CreateOwner(owner);
+
+            if (!(result.Success))
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
             owner.Id = OwnerList.Max(x => x.Id) + 1;
             OwnerList.Add(owner);
 

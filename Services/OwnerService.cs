@@ -1,11 +1,12 @@
 ﻿using CondoProj.Model;
+using CondoProj.Helper;
 
 namespace CondoProj.Services
 {
     public class OwnerService
     {
 
-        public void CreateOwner(Owner owner)
+        public Result CreateOwner(Owner owner)
         {
 
             DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Now);
@@ -13,14 +14,17 @@ namespace CondoProj.Services
 
             if (owner.Birthdate >= dateOnly)
             {
-                throw new Exception("Date must not be greater than today's");
+                return Result.Fail("Date cannot be greater than today's");
             }
             else if (age < 18)
             {
-                throw new Exception("You must be legal age to own an apartment (18 years)");
+                return Result.Fail("You must be of legal age to own an apartment (18 years)");
             }
 
             //salvar no banco de dados quando criado o repository
+
+            return Result.Ok();
+
         }
 
 
