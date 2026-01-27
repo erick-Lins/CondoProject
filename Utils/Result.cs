@@ -1,4 +1,4 @@
-﻿namespace CondoProj.Helper
+﻿namespace CondoProj.Utils
 {
     public class Result
     {

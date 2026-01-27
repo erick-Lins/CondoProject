@@ -1,16 +1,30 @@
 ﻿using CondoProj.Model;
-using CondoProj.Helper;
+using CondoProj.Utils;
+using System.Text.RegularExpressions;
 
 namespace CondoProj.Services
 {
     public class OwnerService
     {
 
-        public Result CreateOwner(Owner owner)
+        public Result ValidateInfoOwner(Owner owner)
         {
+            Helper helper = new Helper();
 
             DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Now);
             int age = dateOnly.Year - owner.Birthdate.Year;
+            bool isNumeric = helper.IsNumeric(owner.FullName);
+
+            if (isNumeric)
+            {
+                return Result.Fail("Name cannot be numeric");
+            }
+
+            if (!(helper.ValidatePronoun(owner.Pronoun)))
+            {
+                return Result.Fail("Pronouns can only be: She (ela), He (ele) or They (elu)");
+            }
+
 
             if (owner.Birthdate >= dateOnly)
             {
@@ -24,11 +38,6 @@ namespace CondoProj.Services
             //salvar no banco de dados quando criado o repository
 
             return Result.Ok();
-
         }
-
-
-
-
     }
 }

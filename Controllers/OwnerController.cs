@@ -1,7 +1,7 @@
 ﻿using CondoProj.Model;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using CondoProj.Helper;
+using CondoProj.Utils;
 using CondoProj.Services;
 
 namespace CondoProj.Controllers
@@ -11,8 +11,7 @@ namespace CondoProj.Controllers
 
     public class OwnerController : ControllerBase
     {
-
-        Util utils = new();
+        Utils.Helper utils = new();
         OwnerService service = new();
 
         private static readonly List<Owner> OwnerList = new List<Owner>
@@ -27,7 +26,6 @@ namespace CondoProj.Controllers
             return Ok(OwnerList);
         }
 
-
         [HttpGet("{id}")]
         public ActionResult GetById(int id)
         {
@@ -36,16 +34,7 @@ namespace CondoProj.Controllers
             if (utils.ValidateId(id, existsId) == false)
                 return BadRequest($"ID: {id} is invalid");
 
-            Owner owner = new();
-
-            foreach (var item in OwnerList)
-            {
-                if (id == item.Id)
-                {
-                    owner = item;
-                    break;
-                }
-            }
+            Owner owner = OwnerList.FirstOrDefault(x => x.Id == id);
 
             return Ok(owner);
         }
@@ -53,7 +42,7 @@ namespace CondoProj.Controllers
         [HttpPost]
         public ActionResult Create(Owner owner)
         {
-            var result = service.CreateOwner(owner);
+            var result = service.ValidateInfoOwner(owner);
 
             if (!(result.Success))
             {
@@ -79,8 +68,13 @@ namespace CondoProj.Controllers
             if (owner == null)
                 return NotFound("Owner not found");
 
-            
+            var result = service.ValidateInfoOwner(updatedOwner);
 
+            if (!result.Success)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            
             owner.FullName = updatedOwner.FullName;
             owner.Birthdate = updatedOwner.Birthdate;
             owner.Pronoun = updatedOwner.Pronoun;
@@ -96,16 +90,7 @@ namespace CondoProj.Controllers
             if (utils.ValidateId(id, isValidId) == false)
                 return BadRequest($"ID: {id} is invalid");
 
-            Owner owner = null;
-
-            foreach(var item in OwnerList)
-            {
-                if (owner.Id == item.Id)
-                {
-                    owner = item;
-                    break;
-                }
-            }
+            Owner owner = OwnerList.FirstOrDefault(x => x.Id == id);
 
             if (owner == null)
                 return NotFound("Owner not found");
