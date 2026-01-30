@@ -7,9 +7,9 @@ using CondoProj.Services;
 namespace CondoProj.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("[controller]")]
 
-    public class OwnerController : ControllerBase
+    public class OwnersController : ControllerBase
     {
         Utils.Helper utils = new();
         OwnerService service = new();
@@ -63,10 +63,7 @@ namespace CondoProj.Controllers
             if (utils.ValidateId(id, isValidId) == false)
                 return BadRequest($"ID: {id} is invalid");
 
-            Owner owner = OwnerList.FirstOrDefault(x => x.Id == id);
-
-            if (owner == null)
-                return NotFound("Owner not found");
+            Owner currentOwner = OwnerList.FirstOrDefault(x => x.Id == id);
 
             var result = service.ValidateInfoOwner(updatedOwner);
 
@@ -74,10 +71,10 @@ namespace CondoProj.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }
-            
-            owner.FullName = updatedOwner.FullName;
-            owner.Birthdate = updatedOwner.Birthdate;
-            owner.Pronoun = updatedOwner.Pronoun;
+
+            currentOwner.FullName = updatedOwner.FullName;
+            currentOwner.Birthdate = updatedOwner.Birthdate;
+            currentOwner.Pronoun = updatedOwner.Pronoun;
 
             return NoContent();
         }
@@ -90,14 +87,11 @@ namespace CondoProj.Controllers
             if (utils.ValidateId(id, isValidId) == false)
                 return BadRequest($"ID: {id} is invalid");
 
-            Owner owner = OwnerList.FirstOrDefault(x => x.Id == id);
+            Owner ownerDeleted = OwnerList.FirstOrDefault(x => x.Id == id);
 
-            if (owner == null)
-                return NotFound("Owner not found");
+            OwnerList.Remove(ownerDeleted);
 
-            OwnerList.Remove(owner);
-
-            return Ok($"Owner {owner.FullName} deleted successfully");
+            return Ok($"Owner {ownerDeleted.FullName} deleted successfully");
         }
     }
 }

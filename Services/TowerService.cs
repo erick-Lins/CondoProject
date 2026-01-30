@@ -7,20 +7,20 @@ namespace CondoProj.Services
     {
         Helper helper = new();
 
-        public Result ValidateInfoTower(Tower tower)
+        public Result ValidateInfoTower(Tower tower, List<Tower> towerList)
         {
-            
-            if(tower.Floors > 20)
-            {
-                Result.Fail("Towers cannot have more than 20 floors.");
-            }
-            
+            //logic to establish perimeter based on size of the apartment
 
+            bool hasTowNumber = CheckTowerNumber(tower, towerList);
+            if (hasTowNumber)
+                return Result.Fail("The tower number must be unique");
 
             return Result.Ok();
         }
 
-
-
+        public bool CheckTowerNumber(Tower tower, List<Tower> towerList)
+        {
+            return towerList.Exists(x => x.TowNumber == tower.TowNumber);
+        }
     }
 }

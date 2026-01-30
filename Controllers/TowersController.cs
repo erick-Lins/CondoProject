@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace CondoProj.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
-    public class TowerController : ControllerBase
+    [Route("[controller]")]
+    public class TowersController : ControllerBase
     {
         Helper helper = new();
         TowerService service = new();
@@ -31,7 +31,7 @@ namespace CondoProj.Controllers
             bool existsId = towerList.Exists(x => x.Id == id);
             if(helper.ValidateId(id, existsId) == false)
             {
-                return BadRequest($"ID: {id} is invalid");
+                return NotFound($"ID: {id} is invalid");
             }
 
             Tower tower = towerList.FirstOrDefault(x => x.Id == id);
@@ -42,7 +42,10 @@ namespace CondoProj.Controllers
         [HttpPost]
         public IActionResult Create(Tower tower)
         {
-            service.ValidateInfoTower();
+            var result = service.ValidateInfoTower(tower, towerList);
+
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
             tower.Id = towerList.Max(x => x.Id) + 1;
             towerList.Add(tower);
@@ -54,6 +57,14 @@ namespace CondoProj.Controllers
         public IActionResult Update(Tower updatedTower, int id)
         {
             Tower towerToUpdate = towerList.FirstOrDefault(x => x.Id == id);
+
+            if (towerToUpdate == null)
+                return NotFound($"ID: {id} is invalid");
+
+            var result = service.ValidateInfoTower(updatedTower, towerList);
+
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
             towerToUpdate.Perimeter = updatedTower.Perimeter;
             towerToUpdate.TowNumber = updatedTower.TowNumber;
@@ -69,16 +80,9 @@ namespace CondoProj.Controllers
         {
             bool existsId = towerList.Exists(x => x.Id == id);
             if (helper.ValidateId(id, existsId) == false)
-            {
                 return BadRequest($"ID: {id} is invalid");
-            }
 
             Tower towerToDelete = towerList.FirstOrDefault(x => x.Id == id);
-
-            if (towerToDelete == null)
-            {
-                return BadRequest("Tower not found");
-            }
 
             towerList.Remove(towerToDelete);
             return NoContent();

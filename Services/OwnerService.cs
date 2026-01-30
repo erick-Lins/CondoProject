@@ -6,7 +6,6 @@ namespace CondoProj.Services
 {
     public class OwnerService
     {
-
         public Result ValidateInfoOwner(Owner owner)
         {
             Helper helper = new Helper();
