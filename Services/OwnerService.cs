@@ -1,42 +1,73 @@
-﻿using CondoProj.Model;
+﻿using CondoProj.Interfaces;
+using CondoProj.Model;
 using CondoProj.Utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.RegularExpressions;
 
 namespace CondoProj.Services
 {
-    public class OwnerService
+    public class OwnerService : IOwnerService
     {
-        public Result ValidateInfoOwner(Owner owner)
+        private static readonly List<Owner> ownerList = new List<Owner>
         {
-            Helper helper = new Helper();
+            new Owner { Id = 1, Birthdate = new DateOnly(1997, 10, 12), FullName = "Rodrigo Ximenes", Pronoun = "He" },
+            new Owner { Id = 2, Birthdate = new DateOnly(2021, 04, 12), FullName = "Crianço pequeno", Pronoun = "He" }
+        };
 
-            DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Now);
-            int age = dateOnly.Year - owner.Birthdate.Year;
-            bool isNumeric = helper.IsNumeric(owner.FullName);
+        public Result Create(Owner owner)
+        {
+            bool hasOwner = ownerList.Any(x => x.FullName == owner.FullName
+                                         && x.Birthdate == owner.Birthdate);
+            if (hasOwner)
+                return Result.Fail("Owners must be unique");
 
-            if (isNumeric)
-            {
-                return Result.Fail("Name cannot be numeric");
-            }
+            owner.Id = ownerList.Max(x => x.Id) + 1;
+            ownerList.Add(owner);
+            return Result.Ok();
+        }
 
-            if (!(helper.ValidatePronoun(owner.Pronoun)))
-            {
-                return Result.Fail("Pronouns can only be: She (ela), He (ele) or They (elu)");
-            }
+        public Result UpdateOwner(int id, Owner newOwner)
+        {
+            if (!ownerList.Exists(x => x.Id == id))
+                return Result.Fail("Owner not found to update.");
 
+            Owner ownerToUpdate = ownerList.FirstOrDefault(x => x.Id == id);
 
-            if (owner.Birthdate >= dateOnly)
-            {
-                return Result.Fail("Date cannot be greater than today's");
-            }
-            else if (age < 18)
-            {
-                return Result.Fail("You must be of legal age to own an apartment (18 years)");
-            }
-
-            //salvar no banco de dados quando criado o repository
+            ownerToUpdate.FullName = newOwner.FullName;
+            ownerToUpdate.Birthdate = newOwner.Birthdate;
+            ownerToUpdate.Pronoun = newOwner.Pronoun;
 
             return Result.Ok();
         }
+
+        public Result Delete(int id)
+        {
+            bool existsId = ownerList.Exists(x => x.Id == id);
+
+            if (!existsId)
+                return Result.Fail("Id not found");
+
+            var ownerToDelete = ownerList.FirstOrDefault(x => x.Id == id);
+            ownerList.Remove(ownerToDelete);
+
+            return Result.Ok();
+
+        }
+
+
+        public List<Owner> GetAll()
+        {
+            return ownerList;
+        }
+
+        public Owner GetById(int id)
+        {
+            var owner = ownerList.FirstOrDefault(x => x.Id == id);
+            if (owner == null)
+                return null;
+
+            return owner;
+        }
+
     }
 }

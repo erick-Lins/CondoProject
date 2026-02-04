@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CondoProj.Model;
 using CondoProj.Services;
+using CondoProj.Interfaces;
 using CondoProj.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,45 +11,46 @@ namespace CondoProj.Controllers
     [Route("[controller]")]
     public class TowersController : ControllerBase
     {
-        Helper helper = new();
-        TowerService service = new();
+        private readonly ITowerService _service;
 
-        private static readonly List<Tower> towerList = new List<Tower>
+        public TowersController(ITowerService service)
         {
-            new Tower { Id = 1, TowNumber = 1, Floors = 15, HasElevator = true, HasRooftop = false, Perimeter = 100  },
-            new Tower { Id = 2, TowNumber = 2, Floors = 15, HasElevator = false, HasRooftop = true, Perimeter = 67.3  }
-        };
+            _service = service;
+        }
 
         [HttpGet]
         public ActionResult GetAll()
         {
-            return Ok(towerList);
+            var result = _service.GetAll();
+
+            if (result == null || !result.Any())
+                return NoContent();
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public ActionResult GetById(int id)
         {
-            bool existsId = towerList.Exists(x => x.Id == id);
-            if(helper.ValidateId(id, existsId) == false)
-            {
-                return NotFound($"ID: {id} is invalid");
-            }
+            var result = _service.GetById(id);
 
-            Tower tower = towerList.FirstOrDefault(x => x.Id == id);
+            if (result == null)
+                return NoContent();
 
-            return Ok(tower);
+            return Ok(result);
         }
 
         [HttpPost]
         public IActionResult Create(Tower tower)
         {
-            var result = service.ValidateInfoTower(tower, towerList);
 
-            if (!result.Success)
+            if(tower == null)
+                return BadRequest("Body request shouldn't be null.");
+
+            var result = _service.Create(tower);
+
+            if (!result.Success || !ModelState.IsValid)
                 return BadRequest(result.ErrorMessage);
-
-            tower.Id = towerList.Max(x => x.Id) + 1;
-            towerList.Add(tower);
 
             return Created();
         }
@@ -56,21 +58,13 @@ namespace CondoProj.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(Tower updatedTower, int id)
         {
-            Tower towerToUpdate = towerList.FirstOrDefault(x => x.Id == id);
-
-            if (towerToUpdate == null)
+            if (updatedTower == null)
                 return NotFound($"ID: {id} is invalid");
 
-            var result = service.ValidateInfoTower(updatedTower, towerList);
+            var result = _service.UpdateTower(id, updatedTower);
 
             if (!result.Success)
                 return BadRequest(result.ErrorMessage);
-
-            towerToUpdate.Perimeter = updatedTower.Perimeter;
-            towerToUpdate.TowNumber = updatedTower.TowNumber;
-            towerToUpdate.HasRooftop = updatedTower.HasRooftop;
-            towerToUpdate.HasElevator = updatedTower.HasElevator;
-            towerToUpdate.Floors = updatedTower.Floors;
 
             return NoContent();
         }
@@ -78,13 +72,7 @@ namespace CondoProj.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            bool existsId = towerList.Exists(x => x.Id == id);
-            if (helper.ValidateId(id, existsId) == false)
-                return BadRequest($"ID: {id} is invalid");
-
-            Tower towerToDelete = towerList.FirstOrDefault(x => x.Id == id);
-
-            towerList.Remove(towerToDelete);
+            _service.Delete(id);
             return NoContent();
         }
 

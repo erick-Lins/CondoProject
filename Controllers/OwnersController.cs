@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using CondoProj.Utils;
 using CondoProj.Services;
+using CondoProj.Interfaces;
 
 namespace CondoProj.Controllers
 {
@@ -11,30 +12,31 @@ namespace CondoProj.Controllers
 
     public class OwnersController : ControllerBase
     {
-        Utils.Helper utils = new();
-        OwnerService service = new();
+        private readonly IOwnerService _service;
 
-        private static readonly List<Owner> OwnerList = new List<Owner>
+        public OwnersController(IOwnerService service)
         {
-            new Owner { Id = 1, Birthdate = new DateOnly(1997, 10, 12), FullName = "Rodrigo Ximenes", Pronoun = "He" },
-            new Owner { Id = 2, Birthdate = new DateOnly(2021, 04, 12), FullName = "Crianço pequeno", Pronoun = "He" }
-        };
+            _service = service;
+        }
 
         [HttpGet]
         public ActionResult GetAll()
         {
-            return Ok(OwnerList);
+            var result = _service.GetAll();
+
+            if (!result.Any())
+                return NoContent();
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public ActionResult GetById(int id)
         {
-            bool existsId = OwnerList.Exists(x => x.Id == id);
+            var owner = _service.GetById(id);
 
-            if (utils.ValidateId(id, existsId) == false)
-                return BadRequest($"ID: {id} is invalid");
-
-            Owner owner = OwnerList.FirstOrDefault(x => x.Id == id);
+            if (owner == null)
+                return NotFound("Owner Not found");
 
             return Ok(owner);
         }
@@ -42,15 +44,9 @@ namespace CondoProj.Controllers
         [HttpPost]
         public ActionResult Create(Owner owner)
         {
-            var result = service.ValidateInfoOwner(owner);
-
-            if (!(result.Success))
-            {
+            var result = _service.Create(owner);
+            if (!result.Success)
                 return BadRequest(result.ErrorMessage);
-            }
-
-            owner.Id = OwnerList.Max(x => x.Id) + 1;
-            OwnerList.Add(owner);
 
             return Created();
         }
@@ -58,40 +54,26 @@ namespace CondoProj.Controllers
         [HttpPut("{id}")]
         public ActionResult Update(int id, Owner updatedOwner)
         {
-            bool isValidId = OwnerList.Exists(x => x.Id == id);
+            if (updatedOwner == null)
+                return NotFound($"ID: {id} is invalid");
 
-            if (utils.ValidateId(id, isValidId) == false)
-                return BadRequest($"ID: {id} is invalid");
-
-            Owner currentOwner = OwnerList.FirstOrDefault(x => x.Id == id);
-
-            var result = service.ValidateInfoOwner(updatedOwner);
+            var result = _service.UpdateOwner(id, updatedOwner);
 
             if (!result.Success)
-            {
                 return BadRequest(result.ErrorMessage);
-            }
-
-            currentOwner.FullName = updatedOwner.FullName;
-            currentOwner.Birthdate = updatedOwner.Birthdate;
-            currentOwner.Pronoun = updatedOwner.Pronoun;
 
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            bool isValidId = OwnerList.Exists(x => x.Id == id);
+            var result = _service.Delete(id);
 
-            if (utils.ValidateId(id, isValidId) == false)
-                return BadRequest($"ID: {id} is invalid");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            Owner ownerDeleted = OwnerList.FirstOrDefault(x => x.Id == id);
-
-            OwnerList.Remove(ownerDeleted);
-
-            return Ok($"Owner {ownerDeleted.FullName} deleted successfully");
+            return NoContent();
         }
     }
 }

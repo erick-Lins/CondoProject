@@ -17,10 +17,10 @@ namespace CondoProj.Model
         [Range(1,20, ErrorMessage = "Floor number must be between 1 and 20.")]
         public int Floors { get; set; }
 
-        [AllowedValues("true", "false", ErrorMessage = "Values accepeted are either true or false.")]
+        [AllowedValues(true, false, ErrorMessage = "Values accepeted are either true or false.")]
         public bool HasRooftop { get; set; }
 
-        [AllowedValues("true", "false", ErrorMessage = "Values accepeted are either true or false.")]
+        [AllowedValues(true, false, ErrorMessage = "Values accepeted are either true or false.")]
         public bool HasElevator { get; set; }
 
         [Required(ErrorMessage = "Perimeter of the tower is required. (in meters)")]

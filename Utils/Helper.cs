@@ -1,18 +1,19 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using CondoProj.Interfaces;
 using CondoProj.Model;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CondoProj.Utils
 {
-    public class Helper
+    public class Helper : IHelper
     {
 
         public bool ValidateId(int? id, bool isValidId)
         {
             return id > 0 && id != null && isValidId ? true : false;
         }
-
         public bool ValidatePronoun(string pronoun)
         {
             List<string> pronoumns = new List<string>
@@ -29,18 +30,6 @@ namespace CondoProj.Utils
 
         }
 
-        public bool IsNumeric(string input)
-        {
-            try
-            {
-                Double.Parse(input);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
 
     }
 }

@@ -1,9 +1,14 @@
 using CondoProj;
+using CondoProj.Interfaces;
+using CondoProj.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddTransient<ITowerService, TowerService>();
+builder.Services.AddTransient<IOwnerService, OwnerService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

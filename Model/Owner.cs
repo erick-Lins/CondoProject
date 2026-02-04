@@ -17,6 +17,7 @@ namespace CondoProj.Model
         public DateOnly Birthdate { get; set; }
 
         [Required(ErrorMessage = "Pronoun is required")]
+        [AllowedValues("He","he", "She", "she", "They", "they", ErrorMessage = "Values must be He, She or They")]
         [RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Pronoun must only have leters")]
         public string Pronoun { get; set; }
     }
