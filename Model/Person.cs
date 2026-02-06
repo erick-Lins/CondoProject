@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace CondoProj.Model
 {
-    public class Owner
+    public class Person
     {
         [JsonIgnore]
         public int Id { get; set; }
@@ -12,13 +13,17 @@ namespace CondoProj.Model
         [RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Name must only have letters.")]
         public string FullName { get; set; }
 
-        [Required(ErrorMessage = "Birthdate is required")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
-        public DateOnly Birthdate { get; set; }
-
         [Required(ErrorMessage = "Pronoun is required")]
-        [AllowedValues("He","he", "She", "she", "They", "they", ErrorMessage = "Values must be He, She or They")]
+        [AllowedValues("He", "he", "She", "she", "They", "they", ErrorMessage = "Values must be He, She or They")]
         [RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Pronoun must only have leters")]
         public string Pronoun { get; set; }
+
+        [Required(ErrorMessage = "Birthdate is required")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime Birthdate { get; set; }
+
+        [JsonIgnore]
+        public string Type { get; set; }
+        public Apartment IdApartment { get; set; }
     }
 }

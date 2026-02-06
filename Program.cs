@@ -8,16 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddTransient<ITowerService, TowerService>();
-builder.Services.AddTransient<IOwnerService, OwnerService>();
+builder.Services.AddTransient<IApartmentService, ApartmentService>();
+builder.Services.AddTransient<IPersonService, PersonService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<CondoDbContext>(opt =>
+builder.Services.AddDbContext<CondoDbContext>(options =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("CondoConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CondoConnectionString"));
 });
 
 

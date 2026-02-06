@@ -9,15 +9,7 @@ namespace CondoProj.Services
 {
     public class TowerService : ITowerService
     {
-
-        private readonly IHelper _helper;
-
-        public TowerService(IHelper helper)
-        {
-            _helper = helper;
-        }
-
-        private static readonly List<Tower> towerList = new List<Tower>
+        public static readonly List<Tower> towerList = new List<Tower>
         {
             new Tower { Id = 1, TowNumber = 1, Floors = 15, HasElevator = true, HasRooftop = false, Perimeter = 100 },
             new Tower { Id = 2, TowNumber = 2, Floors = 20, HasElevator = false, HasRooftop = true, Perimeter = 500 },
