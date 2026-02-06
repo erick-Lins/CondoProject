@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddTransient<ITowerService, TowerService>();
-builder.Services.AddTransient<IApartmentService, ApartmentService>();
-builder.Services.AddTransient<IPersonService, PersonService>();
+builder.Services.AddScoped<ITowerService, TowerService>();
+builder.Services.AddScoped<IApartmentService, ApartmentService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

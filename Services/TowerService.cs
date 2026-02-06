@@ -11,8 +11,8 @@ namespace CondoProj.Services
     {
         public static readonly List<Tower> towerList = new List<Tower>
         {
-            new Tower { Id = 1, TowNumber = 1, Floors = 15, HasElevator = true, HasRooftop = false, Perimeter = 100 },
-            new Tower { Id = 2, TowNumber = 2, Floors = 20, HasElevator = false, HasRooftop = true, Perimeter = 500 },
+            new Tower { TowerId = 1, TowNumber = 1, Floors = 15, HasElevator = true, HasRooftop = false, Perimeter = 100 },
+            new Tower { TowerId = 2, TowNumber = 2, Floors = 20, HasElevator = false, HasRooftop = true, Perimeter = 500 },
         };
 
         public Result Create(Tower tower)
@@ -23,7 +23,7 @@ namespace CondoProj.Services
             if (hasTowNumber)
                 return Result.Fail("The tower number must be unique");
 
-            tower.Id = towerList.Max(x => x.Id) + 1;
+            tower.TowerId = towerList.Max(x => x.TowerId) + 1;
             towerList.Add(tower);
 
             return Result.Ok();
@@ -31,7 +31,7 @@ namespace CondoProj.Services
 
         public Result UpdateTower(int id, Tower newTower)
         {
-            if (towerList.Any(x => x.Id == id) == false)
+            if (towerList.Any(x => x.TowerId == id) == false)
                 return Result.Fail("Tower not found");
 
             bool hasTowNumber = CheckTowerNumber(newTower, towerList);
@@ -39,7 +39,7 @@ namespace CondoProj.Services
             if (hasTowNumber)
                 return Result.Fail("The tower number must be unique");
 
-            Tower towerToUpdate = towerList.FirstOrDefault(x => x.Id == id);
+            Tower towerToUpdate = towerList.FirstOrDefault(x => x.TowerId == id);
 
             towerToUpdate.Perimeter = newTower.Perimeter;
             towerToUpdate.TowNumber = newTower.TowNumber;
@@ -52,12 +52,12 @@ namespace CondoProj.Services
 
         public Result Delete(int id)
         {
-            bool existsId = towerList.Exists(x => x.Id == id);
+            bool existsId = towerList.Exists(x => x.TowerId == id);
 
             if (!existsId)
                 return Result.Fail($"ID: {id} is invalid");
 
-            Tower towerDelete = towerList.FirstOrDefault(x => x.Id == id);
+            Tower towerDelete = towerList.FirstOrDefault(x => x.TowerId == id);
 
             towerList.Remove(towerDelete);
 
@@ -71,7 +71,7 @@ namespace CondoProj.Services
 
         public Tower GetById(int id)
         {
-            var tower = towerList.FirstOrDefault(x => x.Id == id);
+            var tower = towerList.FirstOrDefault(x => x.TowerId == id);
 
             if (tower == null)
                 return null;
@@ -80,7 +80,7 @@ namespace CondoProj.Services
         }
         public bool CheckTowerNumber(Tower tower, List<Tower> towerList)
         {
-            return towerList.Exists(x => x.TowNumber == tower.TowNumber && x.Id != tower.Id);
+            return towerList.Exists(x => x.TowNumber == tower.TowNumber && x.TowerId != tower.TowerId);
         }
     }
 }

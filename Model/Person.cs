@@ -7,7 +7,7 @@ namespace CondoProj.Model
     public class Person
     {
         [JsonIgnore]
-        public int Id { get; set; }
+        public int PersonId { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
         [RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Name must only have letters.")]
@@ -24,6 +24,9 @@ namespace CondoProj.Model
 
         [JsonIgnore]
         public string Type { get; set; }
-        public Apartment IdApartment { get; set; }
+
+        //Navigation Property
+        public List<Apartment> Apartments { get; set; }
+
     }
 }

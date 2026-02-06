@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CondoProj.Migrations
 {
     [DbContext(typeof(CondoDbContext))]
-    [Migration("20260206010209_initCreate")]
+    [Migration("20260206021656_initCreate")]
     partial class initCreate
     {
         /// <inheritdoc />
@@ -27,11 +27,11 @@ namespace CondoProj.Migrations
 
             modelBuilder.Entity("CondoProj.Model.Apartment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ApartmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApartmentId"));
 
                     b.Property<int>("AptNumber")
                         .HasColumnType("int");
@@ -39,26 +39,31 @@ namespace CondoProj.Migrations
                     b.Property<int>("Floor")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdTowerId")
+                    b.Property<int>("PersonId")
                         .HasColumnType("int");
 
                     b.Property<double>("Size")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
+                    b.Property<int>("TowerId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("IdTowerId");
+                    b.HasKey("ApartmentId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("TowerId");
 
                     b.ToTable("Apartments");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Person", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PersonId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
 
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime2");
@@ -66,9 +71,6 @@ namespace CondoProj.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IdApartmentId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Pronoun")
                         .IsRequired()
@@ -78,20 +80,18 @@ namespace CondoProj.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PersonId");
 
-                    b.HasIndex("IdApartmentId");
-
-                    b.ToTable("Residents");
+                    b.ToTable("Persons");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Tower", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TowerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TowerId"));
 
                     b.Property<int>("Floors")
                         .HasColumnType("int");
@@ -108,31 +108,38 @@ namespace CondoProj.Migrations
                     b.Property<int>("TowNumber")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("TowerId");
 
                     b.ToTable("Towers");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Apartment", b =>
                 {
-                    b.HasOne("CondoProj.Model.Tower", "IdTower")
-                        .WithMany()
-                        .HasForeignKey("IdTowerId")
+                    b.HasOne("CondoProj.Model.Person", "Person")
+                        .WithMany("Apartments")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("IdTower");
+                    b.HasOne("CondoProj.Model.Tower", "Tower")
+                        .WithMany("Apartments")
+                        .HasForeignKey("TowerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+
+                    b.Navigation("Tower");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Person", b =>
                 {
-                    b.HasOne("CondoProj.Model.Apartment", "IdApartment")
-                        .WithMany()
-                        .HasForeignKey("IdApartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Apartments");
+                });
 
-                    b.Navigation("IdApartment");
+            modelBuilder.Entity("CondoProj.Model.Tower", b =>
+                {
+                    b.Navigation("Apartments");
                 });
 #pragma warning restore 612, 618
         }

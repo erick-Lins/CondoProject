@@ -6,7 +6,15 @@ namespace CondoProj.Services
 {
     public class PersonService : IPersonService
     {
-        public Result Create(Person resident)
+
+        private readonly CondoDbContext _dbContext;
+
+        public PersonService(CondoDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public Result Create(Person person)
         {
             throw new NotImplementedException();
         }
@@ -18,7 +26,8 @@ namespace CondoProj.Services
 
         public List<Person> GetAll()
         {
-            throw new NotImplementedException();
+            var list = _dbContext.Persons.ToList();
+            return list;
         }
 
         public Person GetById(int id)
@@ -26,7 +35,7 @@ namespace CondoProj.Services
             throw new NotImplementedException();
         }
 
-        public Result UpdateResident(int id, Person newResident)
+        public Result UpdatePerson(int id, Person newPerson)
         {
             throw new NotImplementedException();
         }

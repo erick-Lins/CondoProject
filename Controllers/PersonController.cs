@@ -21,5 +21,13 @@ namespace CondoProj.Controllers
             return Ok();
         }
 
+        [HttpGet]
+        public ActionResult GetAll()
+        {
+            var result = _service.GetAll();
+            return Ok(result);
+        }
+
+
     }
 }

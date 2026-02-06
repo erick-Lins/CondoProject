@@ -6,7 +6,7 @@ namespace CondoProj.Model
     public class Tower
     {
         [JsonIgnore]
-        public int Id { get; set; }
+        public int TowerId { get; set; }
 
         [Required(ErrorMessage = "Number of the tower is required.")]
         [Range(1, 10, ErrorMessage = "Tower number cannot be less than 1 or greater than 10")]
@@ -27,5 +27,9 @@ namespace CondoProj.Model
         [Required(ErrorMessage = "Perimeter of the tower is required. (in meters)")]
         [RegularExpression("(\\d*\\.?\\d+)", ErrorMessage = "Perimeter Value must be a double."), Range(100, 700)]
         public double Perimeter { get; set; }
+
+        //Navigation Property
+        public List<Apartment> Apartments { get; set; }
+
     }
 }
