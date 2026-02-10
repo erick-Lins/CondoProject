@@ -16,12 +16,35 @@ namespace CondoProj.Services
 
         public Result Create(Person person)
         {
-            throw new NotImplementedException();
+            var existsPerson = _dbContext.Persons.Any(x => x.FullName == person.FullName && x.Birthdate == person.Birthdate);
+
+            if (existsPerson)
+                return Result.Fail("This person is already registered");
+
+            //var ageChecker = AgeValidator(person.Birthdate);
+
+            //if (person.Type == "owner" && !ageChecker.Success)
+            //    return Result.Fail(ageChecker.ErrorMessage);
+
+            person.Pronoun = person.Pronoun.ToLower();
+
+            _dbContext.Persons.Add(person);
+            _dbContext.SaveChanges();
+
+            return Result.Ok();
         }
 
         public Result Delete(int id)
         {
-            throw new NotImplementedException();
+            var personToDelete = _dbContext.Persons.FirstOrDefault(x => x.PersonId == id);
+
+            if (personToDelete == null)
+                return Result.Fail($"The Person of id: {id} was not found.");
+
+            _dbContext.Persons.Remove(personToDelete);
+            _dbContext.SaveChanges();
+
+            return Result.Ok();
         }
 
         public List<Person> GetAll()
@@ -32,12 +55,48 @@ namespace CondoProj.Services
 
         public Person GetById(int id)
         {
-            throw new NotImplementedException();
+            var person = _dbContext.Persons.FirstOrDefault(x => x.PersonId == id);
+
+            if (person == null)
+                return null;
+
+            return person;
+
         }
 
         public Result UpdatePerson(int id, Person newPerson)
         {
-            throw new NotImplementedException();
+            var personToUpdate = _dbContext.Persons.FirstOrDefault(x => x.PersonId == id);
+
+            if (personToUpdate == null)
+                return Result.Fail($"Person of id: {id} was not found.");
+
+            bool alreadyExists = _dbContext.Persons.Any(x => x.FullName == newPerson.FullName && x.ApartmentId == newPerson.ApartmentId);
+
+            if (alreadyExists)
+                return Result.Fail($"Person already exists");
+
+            personToUpdate.FullName = newPerson.FullName;
+            personToUpdate.Birthdate = newPerson.Birthdate;
+            personToUpdate.Pronoun = newPerson.Pronoun.ToLower();
+            personToUpdate.Type = newPerson.Type;
+            personToUpdate.ApartmentId = newPerson.ApartmentId;
+
+            return Result.Ok();
         }
+
+        //public Result AgeValidator(DateTime birthDate)
+        //{
+        //    var age = DateTime.Now.Year - birthDate.Year;
+
+        //    switch (age)
+        //    {
+        //        case < 18:
+        //            return Result.Fail("Owners must be of legal age (18 years or gr)");
+        //        case > 
+        //    }
+
+
+        //}
     }
 }

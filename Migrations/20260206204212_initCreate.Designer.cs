@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CondoProj.Migrations
 {
     [DbContext(typeof(CondoDbContext))]
-    [Migration("20260206021656_initCreate")]
+    [Migration("20260206204212_initCreate")]
     partial class initCreate
     {
         /// <inheritdoc />
@@ -39,9 +39,6 @@ namespace CondoProj.Migrations
                     b.Property<int>("Floor")
                         .HasColumnType("int");
 
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Size")
                         .HasColumnType("float");
 
@@ -49,8 +46,6 @@ namespace CondoProj.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ApartmentId");
-
-                    b.HasIndex("PersonId");
 
                     b.HasIndex("TowerId");
 
@@ -64,6 +59,9 @@ namespace CondoProj.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
+
+                    b.Property<int>("ApartmentId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime2");
@@ -81,6 +79,8 @@ namespace CondoProj.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PersonId");
+
+                    b.HasIndex("ApartmentId");
 
                     b.ToTable("Persons");
                 });
@@ -115,26 +115,24 @@ namespace CondoProj.Migrations
 
             modelBuilder.Entity("CondoProj.Model.Apartment", b =>
                 {
-                    b.HasOne("CondoProj.Model.Person", "Person")
-                        .WithMany("Apartments")
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CondoProj.Model.Tower", "Tower")
                         .WithMany("Apartments")
                         .HasForeignKey("TowerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Person");
-
                     b.Navigation("Tower");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Person", b =>
                 {
-                    b.Navigation("Apartments");
+                    b.HasOne("CondoProj.Model.Apartment", "Apartment")
+                        .WithMany()
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Apartment");
                 });
 
             modelBuilder.Entity("CondoProj.Model.Tower", b =>

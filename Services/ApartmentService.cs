@@ -9,40 +9,54 @@ namespace CondoProj.Services
 {
     public class ApartmentService : IApartmentService
     {
+        private readonly CondoDbContext _dbContext;
+        public ApartmentService(CondoDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public Result Create(Apartment apartment)
         {
-            //bool existsApartment = apartmentList.Any(x => x.AptNumber == apartment.AptNumber 
-            //                                           && x.IdTower == apartment.IdTower);
-            //if (existsApartment)
-            //    return Result.Fail($"Apartment already exists in: {apartment.AptNumber}, Tower: {apartment.IdTower}");
+            bool existsApartment = _dbContext.Apartments.Any(x => x.AptNumber == apartment.AptNumber && x.Floor == apartment.Floor && x.TowerId == apartment.TowerId);
 
-            //apartment.Id = apartmentList.Max(x => x.Id) + 1;
-            //apartmentList.Add(apartment);
+            if (existsApartment)
+                return Result.Fail($"The apartment number: {apartment.AptNumber} is already in use.");
+
+            bool existsTower = _dbContext.Towers.Any(x => x.TowerId == apartment.TowerId);
+
+            if (!existsTower)
+                return Result.Fail($"The tower of number {apartment.TowerId} was not found");
+
+            apartment.AptNumber = Convert.ToInt32(String.Concat(apartment.Floor, apartment.AptNumber)); 
+
+            _dbContext.Apartments.Add(apartment);
+            _dbContext.SaveChanges();
 
             return Result.Ok();
         }
 
         public Result Delete(int id)
         {
-            //var apartmentToDelete = apartmentList.FirstOrDefault(x => x.Id == id);
+            var apartmentToDelete = _dbContext.Apartments.FirstOrDefault(x => x.ApartmentId == id);
 
-            //if (apartmentToDelete == null)
-            //    return Result.Fail("Id not found");
+            if (apartmentToDelete == null)
+                return Result.Fail($"Apartment of id: {id} was not found.");
 
-            //apartmentList.Remove(apartmentToDelete);
+            _dbContext.Apartments.Remove(apartmentToDelete);
+            _dbContext.SaveChanges();
 
             return Result.Ok();
         }
 
         public List<Apartment> GetAll()
         {
-            var listAp = new List<Apartment>();
-            return listAp ;
+            var apartmentList = _dbContext.Apartments.ToList();
+            return apartmentList;
         }
 
         public Apartment GetById(int id)
         {
-            var apartment = new Apartment();
+            var apartment = _dbContext.Apartments.FirstOrDefault(x => x.ApartmentId == id);
 
             if (apartment == null)
                 return null;
@@ -52,7 +66,24 @@ namespace CondoProj.Services
 
         public Result UpdateApartment(int id, Apartment newApartment)
         {
-            throw new NotImplementedException();
+            var apartmentToUpdate = _dbContext.Apartments.FirstOrDefault(x => x.ApartmentId == id);
+
+            if (apartmentToUpdate == null)
+                return Result.Fail($"Apartment of id: {id} was not found.");
+
+            bool numberInUse = _dbContext.Apartments.Any(x => x.AptNumber == newApartment.AptNumber && x.ApartmentId != id);
+
+            if (numberInUse)
+                return Result.Fail($"Apartment number {newApartment.AptNumber} is already in use.");
+
+            apartmentToUpdate.Size = newApartment.Size;
+            apartmentToUpdate.Floor = newApartment.Floor;
+            apartmentToUpdate.AptNumber = Convert.ToInt32(String.Concat(newApartment.Floor, newApartment.AptNumber));
+            apartmentToUpdate.TowerId = newApartment.TowerId;
+
+            _dbContext.SaveChanges();
+
+            return Result.Ok();
         }
     }
 }

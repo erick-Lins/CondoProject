@@ -35,7 +35,7 @@ namespace CondoProj.Controllers
             var result = _service.GetById(id);
 
             if (result == null)
-                return NoContent();
+                return NotFound($"Tower of id: {id} was not found.");
 
             return Ok(result);
         }
@@ -72,7 +72,11 @@ namespace CondoProj.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _service.Delete(id);
+            var result = _service.Delete(id);
+
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
+
             return NoContent();
         }
 

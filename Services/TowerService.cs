@@ -9,37 +9,39 @@ namespace CondoProj.Services
 {
     public class TowerService : ITowerService
     {
-        public static readonly List<Tower> towerList = new List<Tower>
+        private readonly CondoDbContext _dbContext;
+        public TowerService(CondoDbContext dbContext)
         {
-            new Tower { TowerId = 1, TowNumber = 1, Floors = 15, HasElevator = true, HasRooftop = false, Perimeter = 100 },
-            new Tower { TowerId = 2, TowNumber = 2, Floors = 20, HasElevator = false, HasRooftop = true, Perimeter = 500 },
-        };
+            _dbContext = dbContext;
+        }
 
         public Result Create(Tower tower)
         {
-            //logic to establish perimeter based on size of the apartment
 
-            bool hasTowNumber = CheckTowerNumber(tower, towerList);
+            bool hasTowNumber = _dbContext.Towers.Any(x => x.TowNumber == tower.TowNumber);
+
             if (hasTowNumber)
                 return Result.Fail("The tower number must be unique");
 
-            tower.TowerId = towerList.Max(x => x.TowerId) + 1;
-            towerList.Add(tower);
+            //logic to establish perimeter based on size of the apartment
+
+            _dbContext.Towers.Add(tower);
+            _dbContext.SaveChangesAsync();
 
             return Result.Ok();
         }
 
         public Result UpdateTower(int id, Tower newTower)
         {
-            if (towerList.Any(x => x.TowerId == id) == false)
-                return Result.Fail("Tower not found");
+            Tower towerToUpdate = _dbContext.Towers.FirstOrDefault(x => x.TowerId == id);
 
-            bool hasTowNumber = CheckTowerNumber(newTower, towerList);
+            if (towerToUpdate == null)
+                return Result.Fail($"The id: {id} was not found.");
 
-            if (hasTowNumber)
-                return Result.Fail("The tower number must be unique");
+            bool numberInUse = _dbContext.Towers.Any(x => x.TowNumber == newTower.TowNumber && x.TowerId != id);
 
-            Tower towerToUpdate = towerList.FirstOrDefault(x => x.TowerId == id);
+            if (numberInUse)
+                return Result.Fail($"The tower number: {newTower.TowNumber} already exists.");
 
             towerToUpdate.Perimeter = newTower.Perimeter;
             towerToUpdate.TowNumber = newTower.TowNumber;
@@ -47,40 +49,38 @@ namespace CondoProj.Services
             towerToUpdate.HasElevator = newTower.HasElevator;
             towerToUpdate.Floors = newTower.Floors;
 
+            _dbContext.SaveChanges();
+
             return Result.Ok();
         }
 
         public Result Delete(int id)
         {
-            bool existsId = towerList.Exists(x => x.TowerId == id);
+            Tower towerToDelete = _dbContext.Towers.FirstOrDefault(x => x.TowerId == id);
 
-            if (!existsId)
-                return Result.Fail($"ID: {id} is invalid");
+            if (towerToDelete == null)
+                return Result.Fail($"Tower of id: {id} was not found.");
 
-            Tower towerDelete = towerList.FirstOrDefault(x => x.TowerId == id);
-
-            towerList.Remove(towerDelete);
+            _dbContext.Towers.Remove(towerToDelete);
+            _dbContext.SaveChanges();
 
             return Result.Ok();
         }
 
         public List<Tower> GetAll()
         {
-            return towerList;
+            var result = _dbContext.Towers.ToList();
+            return result;
         }
 
         public Tower GetById(int id)
         {
-            var tower = towerList.FirstOrDefault(x => x.TowerId == id);
+            var tower = _dbContext.Towers.FirstOrDefault(x => x.TowerId == id);
 
             if (tower == null)
                 return null;
 
             return tower;
-        }
-        public bool CheckTowerNumber(Tower tower, List<Tower> towerList)
-        {
-            return towerList.Exists(x => x.TowNumber == tower.TowNumber && x.TowerId != tower.TowerId);
         }
     }
 }

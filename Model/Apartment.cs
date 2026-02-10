@@ -10,15 +10,10 @@ namespace CondoProj.Model
         public int Floor { get; set; }
         public double Size { get; set; }
         
-        //FK Property
+        //FK Property 
         public int TowerId { get; set; }
         //NavigationProperty
-        public Tower Tower{ get; set; }
-
-        //Fk Property
-        public int PersonId { get; set; }
-        // Navigation Property
-        public Person Person { get; set; }
-
+        [JsonIgnore]
+        public Tower? Tower{ get; set; }
     }
 }

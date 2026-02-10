@@ -29,7 +29,7 @@ namespace CondoProj.Controllers
             var result = _service.GetById(id);
 
             if (result == null)
-                return NotFound();
+                return NotFound($"Apartment of id: {id} was not found.");
 
             return Ok(result);
         }

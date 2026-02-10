@@ -28,8 +28,10 @@ namespace CondoProj.Model
         [RegularExpression("(\\d*\\.?\\d+)", ErrorMessage = "Perimeter Value must be a double."), Range(100, 700)]
         public double Perimeter { get; set; }
 
+
         //Navigation Property
-        public List<Apartment> Apartments { get; set; }
+        [JsonIgnore]
+        public List<Apartment> Apartments { get; set; } = new();
 
     }
 }
