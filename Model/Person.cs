@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 using CondoProj.DataAnnotation;
@@ -12,17 +13,20 @@ namespace CondoProj.Model
         public int PersonId { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
-        //[RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Name must only have letters.")]
-        public string FullName { get; set; }
+        private string _fullName;
+        public string FullName
+        {
+            get => _fullName;
+            set => _fullName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value?.ToLower());
+        }
 
         private string _pronoun;
         [Required(ErrorMessage = "Pronoun is required")]
-        [AllowedValues("he", "she","they", ErrorMessage = "Values must be He, She or They")]
-        //[RegularExpression("^(?=.*?[A-Za-z])[A-Za-z+]+$", ErrorMessage = "Pronoun must only have leters")]
+        [AllowedValues("He", "She","They", ErrorMessage = "Values must be He, She or They")]
         public string Pronoun
         {
             get => _pronoun;
-            set => _pronoun = value?.ToLowerInvariant();
+            set => _pronoun = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value?.ToLower());
         }
 
         [Required(ErrorMessage = "Birthdate is required")]
@@ -31,11 +35,11 @@ namespace CondoProj.Model
 
         private string _type;
         [Required(ErrorMessage = "Type is required.")]
-        [AllowedValues("owner", "resident", ErrorMessage = "Values must be Owner or Resident")]
+        [AllowedValues("Owner", "Resident", ErrorMessage = "Values must be Owner or Resident")]
         public string Type
         {
             get => _type;
-            set => _type.ToLowerInvariant();
+            set => _type = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value?.ToLower());
         }
         //Navigation Property
         [JsonIgnore]

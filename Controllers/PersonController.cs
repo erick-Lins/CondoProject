@@ -34,7 +34,7 @@ namespace CondoProj.Controllers
             if (!result.Success || !ModelState.IsValid)
                 return BadRequest(result.ErrorMessage);
 
-            return Ok();
+            return CreatedAtAction(nameof(GetById), new { id = person.PersonId}, person);
         }
 
         [HttpGet("{id}")]

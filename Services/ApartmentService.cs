@@ -10,9 +10,11 @@ namespace CondoProj.Services
     public class ApartmentService : IApartmentService
     {
         private readonly CondoDbContext _dbContext;
-        public ApartmentService(CondoDbContext dbContext)
+        private readonly ITowerService _towerService;
+        public ApartmentService(CondoDbContext dbContext, ITowerService towerService)
         {
             _dbContext = dbContext;
+            _towerService = towerService;
         }
 
         public Result Create(Apartment apartment)
@@ -26,6 +28,9 @@ namespace CondoProj.Services
 
             if (!existsTower)
                 return Result.Fail($"The tower of number {apartment.TowerId} was not found");
+
+            if (apartment.Floor > _towerService.GetById(apartment.TowerId).Floors)
+                return Result.Fail("The apartment floor number cannot be greater than the tower's");
 
             apartment.AptNumber = Convert.ToInt32(String.Concat(apartment.Floor, apartment.AptNumber)); 
 

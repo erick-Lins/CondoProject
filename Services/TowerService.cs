@@ -82,5 +82,13 @@ namespace CondoProj.Services
 
             return tower;
         }
+
+        public int GetTowerFloors(int towerId)
+        {
+            var tower = _dbContext.Towers.FirstOrDefault(x => x.TowerId == towerId);
+
+            return tower.Floors;
+
+        }
     }
 }

@@ -21,12 +21,8 @@ namespace CondoProj.Services
             if (existsPerson)
                 return Result.Fail("This person is already registered");
 
-            //var ageChecker = AgeValidator(person.Birthdate);
-
-            //if (person.Type == "owner" && !ageChecker.Success)
-            //    return Result.Fail(ageChecker.ErrorMessage);
-
-            person.Pronoun = person.Pronoun.ToLower();
+            if (IsLegalOfAge(person.Birthdate) == false && person.Type == "owner")
+                return Result.Fail("To register as an owner, the person must be of legal age.");
 
             _dbContext.Persons.Add(person);
             _dbContext.SaveChanges();
@@ -85,18 +81,11 @@ namespace CondoProj.Services
             return Result.Ok();
         }
 
-        //public Result AgeValidator(DateTime birthDate)
-        //{
-        //    var age = DateTime.Now.Year - birthDate.Year;
+        public bool IsLegalOfAge(DateTime birthDate)
+        {
+            var age = DateTime.Now.Year - birthDate.Year;
 
-        //    switch (age)
-        //    {
-        //        case < 18:
-        //            return Result.Fail("Owners must be of legal age (18 years or gr)");
-        //        case > 
-        //    }
-
-
-        //}
+            return age > 18 ? true : false;
+        }
     }
 }

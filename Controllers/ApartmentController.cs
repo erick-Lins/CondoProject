@@ -45,7 +45,7 @@ namespace CondoProj.Controllers
             if (!result.Success || !ModelState.IsValid)
                 return BadRequest(result.ErrorMessage);
 
-            return Created();
+            return CreatedAtAction(nameof(GetById), new { id = apartment.ApartmentId }, apartment);
         }
 
         [HttpPut("{id}")]
