@@ -4,6 +4,7 @@ using CondoProj.Utils;
 using CondoProj.Services;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Diagnostics;
 
 namespace CondoProj.Services
 {
@@ -19,20 +20,28 @@ namespace CondoProj.Services
 
         public Result Create(Apartment apartment)
         {
-            bool existsApartment = _dbContext.Apartments.Any(x => x.AptNumber == apartment.AptNumber && x.Floor == apartment.Floor && x.TowerId == apartment.TowerId);
-
-            if (existsApartment)
-                return Result.Fail($"The apartment number: {apartment.AptNumber} is already in use.");
-
-            bool existsTower = _dbContext.Towers.Any(x => x.TowerId == apartment.TowerId);
-
-            if (!existsTower)
-                return Result.Fail($"The tower of number {apartment.TowerId} was not found");
-
-            if (apartment.Floor > _towerService.GetById(apartment.TowerId).Floors)
-                return Result.Fail("The apartment floor number cannot be greater than the tower's");
+            if (apartment.Floor < 0)
+                return Result.Fail($"Floor cannot be negative. (There is no underground garage yet!!!)");
 
             apartment.AptNumber = Convert.ToInt32(String.Concat(apartment.Floor, apartment.AptNumber)); 
+
+            var tower = _towerService.GetById(apartment.TowerId);
+            if (tower == null)
+                return Result.Fail($"Tower of number {apartment.TowerId} was not found");
+
+            if (apartment.Floor > tower.Floors)
+                return Result.Fail("Apartment floor number cannot be greater than the tower's");
+
+            if (!IsSizeValid(apartment, tower))
+                return Result.Fail($"Apartment size exceeds the 80% of floor threshold");
+
+            bool exists = _dbContext.Apartments.Any(x => 
+                x.AptNumber == apartment.AptNumber && 
+                x.Floor == apartment.Floor && 
+                x.TowerId == apartment.TowerId);
+
+            if (exists)
+                return Result.Fail($"Apartment number: {apartment.AptNumber} is already in use.");
 
             _dbContext.Apartments.Add(apartment);
             _dbContext.SaveChanges();
@@ -89,6 +98,20 @@ namespace CondoProj.Services
             _dbContext.SaveChanges();
 
             return Result.Ok();
+        }
+
+        public bool IsSizeValid(Apartment apartment, Tower tower)
+        {
+
+            double towerSize = tower.Perimeter;
+
+            double floorSum = _dbContext.Apartments
+                                .Where(x => x.Floor == apartment.Floor)
+                                .Sum(x => x.Size) + apartment.Size;
+
+            double thresholdValue = (towerSize * 80) / 100;
+
+            return floorSum > thresholdValue ? false : true;
         }
     }
 }
