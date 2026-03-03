@@ -49,14 +49,6 @@ namespace CondoProj.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
-        {
-            var result = _service.Delete(id);
-
-            return Ok();
-        }
-
         [HttpPut("{id}")]
         public ActionResult Update(int id, Person newPerson)
         {
@@ -69,6 +61,14 @@ namespace CondoProj.Controllers
                 return BadRequest(result.ErrorMessage);
 
             return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            var result = _service.Delete(id);
+
+            return Ok();
         }
 
     }

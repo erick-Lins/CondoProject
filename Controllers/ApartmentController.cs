@@ -54,12 +54,12 @@ namespace CondoProj.Controllers
             if (updatedAparment == null)
                 return NotFound("Apartment not found");
 
-            var result = _service.UpdateApartment(id, updatedAparment);
+            var result = _service.Update(id, updatedAparment);
 
             if (!result.Success)
                 return BadRequest(result.ErrorMessage);
 
-            return NoContent();  
+            return AcceptedAtAction(nameof(GetById), new { id = updatedAparment.ApartmentId }, updatedAparment);  
         }
 
         [HttpDelete("{id}")]

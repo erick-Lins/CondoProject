@@ -17,13 +17,8 @@ namespace CondoProj.Services
 
         public Result Create(Tower tower)
         {
-
-            bool hasTowNumber = _dbContext.Towers.Any(x => x.TowNumber == tower.TowNumber);
-
-            if (hasTowNumber)
-                return Result.Fail("The tower number must be unique");
-
-            //logic to establish perimeter based on size of the apartment
+            if (IsNumberInUse(tower))
+                return Result.Fail($"The tower number: {tower.TowNumber} already exists.");
 
             _dbContext.Towers.Add(tower);
             _dbContext.SaveChangesAsync();
@@ -38,9 +33,7 @@ namespace CondoProj.Services
             if (towerToUpdate == null)
                 return Result.Fail($"The id: {id} was not found.");
 
-            bool numberInUse = _dbContext.Towers.Any(x => x.TowNumber == newTower.TowNumber && x.TowerId != id);
-
-            if (numberInUse)
+            if (IsNumberInUse(newTower))
                 return Result.Fail($"The tower number: {newTower.TowNumber} already exists.");
 
             towerToUpdate.Perimeter = newTower.Perimeter;
@@ -90,5 +83,11 @@ namespace CondoProj.Services
             return tower.Floors;
 
         }
+
+        public bool IsNumberInUse(Tower tower)
+        {
+            return _dbContext.Towers.Any(x => x.TowNumber == tower.TowNumber && x.TowerId != tower.TowerId);
+        }
+
     }
 }

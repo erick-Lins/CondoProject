@@ -1,4 +1,5 @@
-﻿using CondoProj.Interfaces;
+﻿using System;
+using CondoProj.Interfaces;
 using CondoProj.Model;
 using CondoProj.Utils;
 
@@ -21,7 +22,7 @@ namespace CondoProj.Services
             if (existsPerson)
                 return Result.Fail("This person is already registered");
 
-            if (IsLegalOfAge(person.Birthdate) == false && person.Type == "owner")
+            if (!IsAllowedToOwn(person.Birthdate, person.Type))
                 return Result.Fail("To register as an owner, the person must be of legal age.");
 
             _dbContext.Persons.Add(person);
@@ -72,6 +73,9 @@ namespace CondoProj.Services
             if (alreadyExists)
                 return Result.Fail($"Person already exists");
 
+            if (!IsAllowedToOwn(newPerson.Birthdate, newPerson.Type))
+                return Result.Fail("To register as an owner, the person must be of legal age.");
+
             personToUpdate.FullName = newPerson.FullName;
             personToUpdate.Birthdate = newPerson.Birthdate;
             personToUpdate.Pronoun = newPerson.Pronoun.ToLower();
@@ -81,11 +85,11 @@ namespace CondoProj.Services
             return Result.Ok();
         }
 
-        public bool IsLegalOfAge(DateTime birthDate)
+        public bool IsAllowedToOwn(DateTime birthDate, string personType)
         {
             var age = DateTime.Now.Year - birthDate.Year;
 
-            return age > 18 ? true : false;
+            return personType == "owner" && age >= 18 ? true : false;
         }
     }
 }

@@ -20,28 +20,10 @@ namespace CondoProj.Services
 
         public Result Create(Apartment apartment)
         {
-            if (apartment.Floor < 0)
-                return Result.Fail($"Floor cannot be negative. (There is no underground garage yet!!!)");
+            var validationResult = Validate(apartment);
 
-            apartment.AptNumber = Convert.ToInt32(String.Concat(apartment.Floor, apartment.AptNumber)); 
-
-            var tower = _towerService.GetById(apartment.TowerId);
-            if (tower == null)
-                return Result.Fail($"Tower of number {apartment.TowerId} was not found");
-
-            if (apartment.Floor > tower.Floors)
-                return Result.Fail("Apartment floor number cannot be greater than the tower's");
-
-            if (!IsSizeValid(apartment, tower))
-                return Result.Fail($"Apartment size exceeds the 80% of floor threshold");
-
-            bool exists = _dbContext.Apartments.Any(x => 
-                x.AptNumber == apartment.AptNumber && 
-                x.Floor == apartment.Floor && 
-                x.TowerId == apartment.TowerId);
-
-            if (exists)
-                return Result.Fail($"Apartment number: {apartment.AptNumber} is already in use.");
+            if (validationResult.Success == false)
+                return Result.Fail(validationResult.ErrorMessage);
 
             _dbContext.Apartments.Add(apartment);
             _dbContext.SaveChanges();
@@ -78,17 +60,17 @@ namespace CondoProj.Services
             return apartment;
         }
 
-        public Result UpdateApartment(int id, Apartment newApartment)
+        public Result Update(int id, Apartment newApartment)
         {
+            var validationResult = Validate(newApartment);
+
+            if (validationResult.Success == false)
+                return Result.Fail(validationResult.ErrorMessage);
+
             var apartmentToUpdate = _dbContext.Apartments.FirstOrDefault(x => x.ApartmentId == id);
 
             if (apartmentToUpdate == null)
                 return Result.Fail($"Apartment of id: {id} was not found.");
-
-            bool numberInUse = _dbContext.Apartments.Any(x => x.AptNumber == newApartment.AptNumber && x.ApartmentId != id);
-
-            if (numberInUse)
-                return Result.Fail($"Apartment number {newApartment.AptNumber} is already in use.");
 
             apartmentToUpdate.Size = newApartment.Size;
             apartmentToUpdate.Floor = newApartment.Floor;
@@ -96,6 +78,31 @@ namespace CondoProj.Services
             apartmentToUpdate.TowerId = newApartment.TowerId;
 
             _dbContext.SaveChanges();
+
+            return Result.Ok();
+        }
+
+        public Result Validate(Apartment apartment)
+        {
+            if (apartment.Floor < 0)
+                return Result.Fail($"Floor cannot be negative. (There is no underground garage yet!!!)");
+
+            apartment.AptNumber = Convert.ToInt32(String.Concat(apartment.Floor, apartment.AptNumber));
+
+            bool numberInUse = _dbContext.Apartments.Any(x => x.AptNumber == apartment.AptNumber && x.TowerId != apartment.TowerId);
+
+            if (numberInUse)
+                return Result.Fail($"Apartment number {apartment.AptNumber} is already in use.");
+
+            var tower = _towerService.GetById(apartment.TowerId);
+            if (tower == null)
+                return Result.Fail($"Tower of number {apartment.TowerId} was not found");
+
+            if (apartment.Floor > tower.Floors)
+                return Result.Fail("Apartment floor number cannot be greater than the tower's");
+
+            if (!IsSizeValid(apartment, tower))
+                return Result.Fail($"Apartment size exceeds the 80% of floor threshold");
 
             return Result.Ok();
         }

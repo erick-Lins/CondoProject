@@ -13,6 +13,7 @@ namespace CondoProj.Model
         [Required]
         public int Floor { get; set; }
         [Required]
+        [Range(20, 93.5, ErrorMessage = "Size of the apartment must be between 20m² and 93.5m²")]
         public double Size { get; set; }
         //FK Property 
         public int TowerId { get; set; }
