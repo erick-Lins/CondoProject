@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using CondoProj.Interfaces;
-using CondoProj.Model;
+using CondoProj.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CondoProj.Utils

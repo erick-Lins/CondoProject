@@ -1,6 +1,6 @@
 ﻿using System;
 using CondoProj.Interfaces;
-using CondoProj.Model;
+using CondoProj.Models;
 using CondoProj.Utils;
 
 namespace CondoProj.Services
@@ -89,7 +89,7 @@ namespace CondoProj.Services
         {
             var age = DateTime.Now.Year - birthDate.Year;
 
-            return personType == "owner" && age >= 18 ? true : false;
+            return personType.Equals("owner", StringComparison.OrdinalIgnoreCase) && age >= 18 ? true : false;
         }
     }
 }

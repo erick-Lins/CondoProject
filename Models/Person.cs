@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using CondoProj.DataAnnotation;
 using Microsoft.AspNetCore.SignalR.Protocol;
 
-namespace CondoProj.Model
+namespace CondoProj.Models
 {
     public class Person
     {

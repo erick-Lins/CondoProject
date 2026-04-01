@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using CondoProj.Model;
+using CondoProj.Models;
 using CondoProj.Interfaces;
 using CondoProj.Utils;
 using Microsoft.AspNetCore.Http.HttpResults;

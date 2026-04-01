@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CondoProj.Model;
+using CondoProj.Models;
 using CondoProj.Services;
 using CondoProj.Interfaces;
 using CondoProj.Utils;

@@ -1,4 +1,4 @@
-﻿using CondoProj.Model;
+﻿using CondoProj.Models;
 using CondoProj.Utils;
 
 namespace CondoProj.Interfaces

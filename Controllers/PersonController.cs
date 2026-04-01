@@ -1,5 +1,5 @@
 ﻿using CondoProj.Interfaces;
-using CondoProj.Model;
+using CondoProj.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CondoProj.Controllers

@@ -1,5 +1,5 @@
 ﻿using CondoProj.Interfaces;
-using CondoProj.Model;
+using CondoProj.Models;
 using CondoProj.Utils;
 using CondoProj.Services;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;

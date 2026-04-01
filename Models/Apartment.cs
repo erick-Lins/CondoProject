@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace CondoProj.Model
+namespace CondoProj.Models
 {
     public class Apartment
     {

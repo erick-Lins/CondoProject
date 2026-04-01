@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CondoProj.Interfaces;
-using CondoProj.Model;
+using CondoProj.Models;
 
 namespace CondoProj.Controllers
 {
